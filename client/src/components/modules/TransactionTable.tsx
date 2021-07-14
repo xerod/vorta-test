@@ -1,9 +1,41 @@
 import React from "react";
 import { ArrowRightIcon } from "@heroicons/react/solid";
+import { TransactionDetails, TransactionResult } from "types/transaction";
+import useSWR from "swr";
+import fetch from "libs/fetch";
+import Spinner from "components/elements/Spinner";
 
 export { TransactionTable };
 
-function TransactionTable({ transactions }: { transactions: any }) {
+function TransactionTable({ walletId, page }: { walletId: string; page: any }) {
+  const { data, error, isValidating } = useSWR<TransactionResult[]>(
+    `http://localhost:4000/transactions/${walletId}?page=${page}`,
+    fetch,
+    { shouldRetryOnError: false }
+  );
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center space-y-2 bg-gray-50 min-h-40">
+        <p className="text-4xl font-light text-gray-600">No data found :(</p>
+        <a
+          href="/transaction"
+          className="text-sm text-gray-500 hover:underline"
+        >
+          Click here to find another transaction
+        </a>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="flex flex-col items-center justify-center space-y-2 bg-gray-50 min-h-40">
+        <Spinner />
+      </div>
+    );
+  }
+
   return (
     <>
       <table className="min-w-full divide-y divide-gray-200">
@@ -48,7 +80,7 @@ function TransactionTable({ transactions }: { transactions: any }) {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {transactions.map((item: any) => (
+          {data?.map((item: any) => (
             <tr key={item.hash}>
               <td className="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
                 {item.blockNumber}
