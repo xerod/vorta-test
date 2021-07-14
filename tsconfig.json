@@ -22,5 +22,5 @@
       "types/*": ["~/src/types/*"]
     }
   },
-  "include": ["./src"]
+  "include": ["./client/src", "./server/src"]
 }

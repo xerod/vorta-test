@@ -10,6 +10,7 @@
     "start:dev": "concurrently -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"npm run dev:client\" \"npm run dev:server\" "
   },
   "dependencies": {
+    "@nestjs/mapped-types": "*",
     "concurrently": "^6.2.0"
   }
 }
