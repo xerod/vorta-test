@@ -1,0 +1,15 @@
+{
+  "name": "vorta-test",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev:client": "npm run dev --workspace=client",
+    "dev:server": "npm run start:dev --workspace=server",
+    "start:dev": "concurrently -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"npm run dev:client\" \"npm run dev:server\" "
+  },
+  "dependencies": {
+    "concurrently": "^6.2.0"
+  }
+}
