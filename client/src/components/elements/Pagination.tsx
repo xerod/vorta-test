@@ -96,7 +96,6 @@ export const Pagination = (props: Props): ReactElement => {
             <span className="font-medium">
               {Math.min(activePage * itemPerPage, totalItem)}
             </span>{" "}
-            of <span className="font-medium">{totalItem}</span> results
           </p>
         </div>
         <div>

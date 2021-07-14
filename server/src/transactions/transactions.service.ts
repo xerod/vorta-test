@@ -1,6 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { firstValueFrom, lastValueFrom, take } from 'rxjs';
+import { firstValueFrom, take } from 'rxjs';
 import {
   Transaction,
   TransactionResponse,
