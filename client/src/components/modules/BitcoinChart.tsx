@@ -5,10 +5,8 @@ import StreamingPlugin from "chartjs-plugin-streaming";
 
 Chart.register(StreamingPlugin);
 
-const BitcoinChart = () => {
+const BitcoinChart: React.FC = () => {
   const chart = useRef<any>();
-  const [trades, setTrades] = useState(null);
-  const [loaded, setLoaded] = useState(false);
   const currencyPair = "btcusd";
   const currencyArray = currencyPair.toUpperCase().match(/.{1,3}/g);
 
@@ -29,9 +27,7 @@ const BitcoinChart = () => {
     ws.onmessage = (event) => {
       const response = JSON.parse(event.data);
 
-      //   console.log(response.data.price);
-
-      console.log(response.data.price);
+      console.log("RECEIVE");
 
       chart.current.data.datasets[0].data.push({
         x: Date.now(),
@@ -39,10 +35,6 @@ const BitcoinChart = () => {
       });
 
       chart.current.update("quiet");
-
-      //       if (response.data && !trades) {
-      //         setTrades(response.data);
-      //       }
     };
 
     ws.onclose = () => {
@@ -50,12 +42,17 @@ const BitcoinChart = () => {
     };
 
     return () => {
+      Object.entries(Chart.instances).forEach(([index, instance]) => {
+        instance.destroy();
+      });
+
       ws.close();
     };
   }, [currencyPair]);
 
   return (
     <Line
+      key="bitcoin"
       ref={chart}
       type="line"
       data={{
@@ -77,15 +74,6 @@ const BitcoinChart = () => {
           mode: "interpolate",
           intersect: false,
         },
-        plugins: {
-          crosshair: {
-            line: {
-              color: "rgb(255, 99, 132)", // crosshair line color
-              width: 1, // crosshair line width
-              dashPattern: [5, 5],
-            },
-          },
-        },
         scales: {
           x: {
             type: "realtime",
@@ -96,7 +84,6 @@ const BitcoinChart = () => {
               refresh: 1000,
               onRefresh: (chart: any) => {
                 const previous = chart.data.datasets[0].data.pop();
-                console.log(previous?.y);
 
                 previous &&
                   chart.data.datasets[0].data.push({

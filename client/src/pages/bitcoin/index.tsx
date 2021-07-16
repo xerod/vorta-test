@@ -1,6 +1,7 @@
+import React from "react";
 import BitcoinChart from "components/modules/BitcoinChart";
 
-const Bitcoin = () => {
+const Bitcoin: React.FC = () => {
   return (
     <div>
       <BitcoinChart />

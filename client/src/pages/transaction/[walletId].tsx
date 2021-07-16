@@ -7,7 +7,7 @@ import { TransactionTable } from "components/modules/TransactionTable";
 import { Pagination } from "components/elements/Pagination";
 
 export default function Page() {
-  const walletId = location.pathname.replace("/transaction/", "");
+  const walletId = location.pathname.split("/")[2];
 
   const [page, setPage] = useState(1);
 
