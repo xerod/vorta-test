@@ -1,10 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { firstValueFrom, take } from 'rxjs';
-import {
-  Transaction,
-  TransactionResponse,
-} from './entities/transaction.entity';
+import { Transaction, TransactionResponse } from './dto/transaction.dto';
 
 @Injectable()
 export class TransactionsService {
