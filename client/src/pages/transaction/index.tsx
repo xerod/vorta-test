@@ -1,10 +1,11 @@
+import RouteGuard from "components/templates/RouteGuard";
 import React, { useState } from "react";
 
-export default function Page() {
+const TransactionPage: React.FC = () => {
   const [address, setAddress] = useState("");
 
   return (
-    <>
+    <RouteGuard>
       <h1>Transactions</h1>
 
       <div className="flex flex-col space-y-4 min-w-xl">
@@ -22,6 +23,8 @@ export default function Page() {
           </button>
         </a>
       </div>
-    </>
+    </RouteGuard>
   );
-}
+};
+
+export default TransactionPage;

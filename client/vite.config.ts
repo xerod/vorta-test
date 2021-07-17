@@ -9,6 +9,19 @@ export default defineConfig({
   plugins: [
     Pages({
       react: true,
+      onClientGenerated: (client) => {
+        console.log(client);
+      },
+      extendRoute: (route, parent) => {
+        if (route.path === "/") {
+          return route;
+        }
+
+        return {
+          ...route,
+          meta: { auth: true },
+        };
+      },
     }),
     reactRefresh(),
     WindiCSS(),
