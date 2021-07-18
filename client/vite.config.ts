@@ -9,12 +9,9 @@ export default defineConfig({
   plugins: [
     Pages({
       react: true,
-      onClientGenerated: (client) => {
-        console.log(client);
-      },
       extendRoute: (route, parent) => {
         if (route.path === "/") {
-          return route;
+          return null;
         }
 
         return {
@@ -22,6 +19,7 @@ export default defineConfig({
           meta: { auth: true },
         };
       },
+      exclude: ["src/pages/*.tsx"],
     }),
     reactRefresh(),
     WindiCSS(),

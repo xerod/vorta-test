@@ -10,13 +10,17 @@ import { renderRoutes } from "react-router-config";
 import routes from "virtual:generated-pages-react";
 import Home from "./pages/index";
 import NoMatch from "./pages/[...all]";
+import {
+  authenticationService,
+  userSubjectType,
+} from "./shared/services/auth.service";
+import { userService } from "./shared/services/user.service";
+import Layout from "components/layouts/Layout";
 
 const App: React.FC = () => {
-  const isAuthenticated = false;
-
   return (
     <Router>
-      {!isAuthenticated && (
+      {!authenticationService.currentUserValue && (
         <Switch>
           <Route exact path="/">
             <Home />
@@ -26,7 +30,9 @@ const App: React.FC = () => {
           </Route>
         </Switch>
       )}
-      {isAuthenticated && renderRoutes(routes)}
+      {authenticationService.currentUserValue && (
+        <Layout>{renderRoutes(routes)}</Layout>
+      )}
     </Router>
   );
 };

@@ -1,11 +1,10 @@
-import RouteGuard from "components/templates/RouteGuard";
 import React, { useState } from "react";
 
 const TransactionPage: React.FC = () => {
   const [address, setAddress] = useState("");
 
   return (
-    <RouteGuard>
+    <>
       <h1>Transactions</h1>
 
       <div className="flex flex-col space-y-4 min-w-xl">
@@ -23,7 +22,7 @@ const TransactionPage: React.FC = () => {
           </button>
         </a>
       </div>
-    </RouteGuard>
+    </>
   );
 };
 

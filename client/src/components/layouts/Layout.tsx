@@ -1,7 +1,11 @@
 import React, { Fragment, useEffect, useState } from "react";
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import { HomeIcon, MenuIcon, UsersIcon, XIcon } from "@heroicons/react/outline";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
+import { SelectorIcon } from "@heroicons/react/solid";
+import { authenticationService } from "../../shared/services/auth.service";
+import { userResponse, userService } from "../../shared/services/user.service";
+import SkeletonText from "components/elements/SkeletonText";
 
 const navigation = [
   { name: "Transaction", href: "/transaction", icon: HomeIcon, current: true },
@@ -13,9 +17,18 @@ function classNames(...classes: any[]) {
 }
 
 const Layout: React.FC = ({ children }) => {
+  const history = useHistory();
+  let location = useLocation();
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isSelectedPath, setSelectedPath] = useState("/");
-  let location = useLocation();
+  const [user, setUser] = useState<userResponse>();
+
+  useEffect(() => {
+    if (!user && authenticationService.currentUserValue) {
+      userService.getUser().then((user) => setUser(user));
+    }
+  }, []);
 
   useEffect(() => {
     const current_path = location.pathname.split("/")[1];
@@ -120,8 +133,8 @@ const Layout: React.FC = ({ children }) => {
                       <p className="text-base font-medium text-gray-700 group-hover:text-gray-900">
                         Tom Cook
                       </p>
-                      <p className="text-sm font-medium text-gray-500 group-hover:text-gray-700">
-                        View profile
+                      <p className="text-sm font-medium text-red-500 group-hover:text-red-700">
+                        Logout
                       </p>
                     </div>
                   </div>
@@ -141,13 +154,105 @@ const Layout: React.FC = ({ children }) => {
           {/* Sidebar component, swap this element with another sidebar if you like */}
           <div className="flex flex-col flex-1 h-0 bg-white border-r border-gray-200">
             <div className="flex flex-col flex-1 pt-5 pb-4 overflow-y-auto">
-              <div className="flex items-center flex-shrink-0 px-4">
-                <img
-                  className="w-auto h-8"
-                  src="https://tailwindui.com/img/logos/workflow-logo-indigo-600-mark-gray-800-text.svg"
-                  alt="Workflow"
-                />
+              <div className="flex items-center flex-shrink-0 px-4 space-x-3">
+                <p className="text-2xl font-extrabold text-purple-900">
+                  Logohere
+                </p>
               </div>
+
+              <div className="flex flex-shrink-0 mt-6 border-t border-b border-gray-200">
+                <Menu
+                  as="div"
+                  className="relative inline-block w-full text-left"
+                >
+                  {({ open }) => (
+                    <>
+                      <div>
+                        <Menu.Button className="group w-full px-3.5 py-4 text-sm text-left font-medium text-gray-700 hover:bg-gray-100 focus:outline-none">
+                          <span className="flex items-center justify-between w-full">
+                            <span className="flex items-center justify-between min-w-0 space-x-3">
+                              <img
+                                className="flex-shrink-0 w-10 h-10 bg-gray-300 rounded-full"
+                                src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=3&w=256&h=256&q=80"
+                                alt=""
+                              />
+                              <span className="flex flex-col flex-1 min-w-32">
+                                <SkeletonText loading={!user}>
+                                  <span className="text-sm font-medium text-gray-900 truncate">
+                                    {user?.firstName} {user?.lastName}
+                                  </span>
+                                </SkeletonText>
+
+                                <SkeletonText loading={!user}>
+                                  <span className="text-sm text-gray-500 truncate">
+                                    {user?.email}
+                                  </span>
+                                </SkeletonText>
+                              </span>
+                            </span>
+                            <SelectorIcon
+                              className="flex-shrink-0 w-5 h-5 text-gray-400 group-hover:text-gray-500"
+                              aria-hidden="true"
+                            />
+                          </span>
+                        </Menu.Button>
+                      </div>
+                      <Transition
+                        show={open}
+                        as={Fragment}
+                        enter="transition ease-out duration-100"
+                        enterFrom="transform opacity-0 scale-95"
+                        enterTo="transform opacity-100 scale-100"
+                        leave="transition ease-in duration-75"
+                        leaveFrom="transform opacity-100 scale-100"
+                        leaveTo="transform opacity-0 scale-95"
+                      >
+                        <Menu.Items
+                          static
+                          className="absolute right-0 z-10 mx-1 mt-1 origin-top bg-white divide-y divide-gray-200 rounded-md shadow-lg left-10 ring-1 ring-black ring-opacity-10 focus:outline-none"
+                        >
+                          <div className="px-1 py-1">
+                            <Menu.Item>
+                              {({ active }) => (
+                                <a
+                                  href="#"
+                                  className={classNames(
+                                    active
+                                      ? "bg-gray-100 rounded-md text-gray-800"
+                                      : "text-gray-700",
+                                    "block p-2 text-sm"
+                                  )}
+                                >
+                                  View Profile
+                                </a>
+                              )}
+                            </Menu.Item>
+                            <Menu.Item>
+                              {({ active }) => (
+                                <div
+                                  className={classNames(
+                                    active
+                                      ? "bg-red-50 rounded-md text-black text-red-700 cursor-pointer"
+                                      : "text-red-500",
+                                    "block p-2 text-sm"
+                                  )}
+                                  onClick={() => {
+                                    authenticationService.logout();
+                                    window.location.href = "/";
+                                  }}
+                                >
+                                  Logout
+                                </div>
+                              )}
+                            </Menu.Item>
+                          </div>
+                        </Menu.Items>
+                      </Transition>
+                    </>
+                  )}
+                </Menu>
+              </div>
+
               <nav className="flex-1 px-2 mt-5 space-y-1 bg-white">
                 {navigation.map((item) => (
                   <Link
@@ -173,27 +278,6 @@ const Layout: React.FC = ({ children }) => {
                   </Link>
                 ))}
               </nav>
-            </div>
-            <div className="flex flex-shrink-0 p-4 border-t border-gray-200">
-              <a href="#" className="flex-shrink-0 block w-full group">
-                <div className="flex items-center">
-                  <div>
-                    <img
-                      className="inline-block rounded-full h-9 w-9"
-                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                      alt=""
-                    />
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
-                      Tom Cook
-                    </p>
-                    <p className="text-xs font-medium text-gray-500 group-hover:text-gray-700">
-                      View profile
-                    </p>
-                  </div>
-                </div>
-              </a>
             </div>
           </div>
         </div>

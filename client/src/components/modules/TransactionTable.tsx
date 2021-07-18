@@ -1,8 +1,8 @@
 import React from "react";
 import { ArrowRightIcon } from "@heroicons/react/solid";
-import { TransactionDetails, TransactionResult } from "types/transaction";
+import { TransactionResult } from "types/transaction";
 import useSWR from "swr";
-import fetch from "libs/fetch";
+import fetch from "../../shared/helpers/fetch";
 import Spinner from "components/elements/Spinner";
 
 export { TransactionTable };

@@ -44,6 +44,10 @@ export class UsersService {
   async findOne(options?: Record<string, unknown>): Promise<UserDto> {
     const user = await this.userRepo.findOne(options);
 
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+    }
+
     return this.toUserDto(user);
   }
 
