@@ -12,7 +12,7 @@ import { JwtStrategy } from './jwt.strategy';
     PassportModule.register({
       defaultStrategy: 'jwt',
       property: 'user',
-      session: false,
+      session: true,
     }),
     JwtModule.register({
       secret: process.env.SECRETKEY,

@@ -45,7 +45,7 @@ export class UsersService {
     const user = await this.userRepo.findOne(options);
 
     if (!user) {
-      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+      throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
     }
 
     return this.toUserDto(user);

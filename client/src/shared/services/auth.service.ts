@@ -15,9 +15,10 @@ export function handleResponse(response: any) {
     if (!response.ok) {
       if ([401, 403].indexOf(response.status) !== -1) {
         // auto logout if 401 Unauthorized or 403 Forbidden response returned from api
+        console.log(location.pathname);
         authenticationService.logout();
         if (location.pathname !== "/") {
-          location.reload();
+          location.href = "/";
         }
       }
 
