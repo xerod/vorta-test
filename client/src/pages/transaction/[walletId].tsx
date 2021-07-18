@@ -10,15 +10,12 @@ export default function Page() {
 
   return (
     <>
-      <div className="flex items-end my-8 space-y-1">
-        <p className="mr-2 text-4xl font-bold">Transactions</p>
-        <p className="text-lg text-gray-400">({walletId})</p>
-      </div>
+      <p className="text-lg text-gray-400">({walletId})</p>
 
-      <div className="flex flex-col">
+      <div className="flex flex-col mt-6">
         <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-            <div className="overflow-hidden border border-gray-200 shadow sm:rounded-lg">
+            <div className="overflow-x-hidden border border-gray-200 shadow sm:rounded-lg">
               <TransactionTable walletId={walletId} page={page} />
               <div className="hidden">
                 <TransactionTable walletId={walletId} page={page + 1} />

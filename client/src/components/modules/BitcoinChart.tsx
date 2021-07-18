@@ -2,12 +2,13 @@ import React, { useEffect, useRef, useState } from "react";
 import { Line, Chart } from "react-chartjs-2";
 import "chartjs-adapter-luxon";
 import StreamingPlugin from "chartjs-plugin-streaming";
+import zoomPlugin from "chartjs-plugin-zoom";
 
-Chart.register(StreamingPlugin);
+Chart.register(StreamingPlugin, zoomPlugin);
 
 const BitcoinChart: React.FC = () => {
   const chart = useRef<any>();
-  const currencyPair = "btcusd";
+  const currencyPair = "btcusdt";
   const currencyArray = currencyPair.toUpperCase().match(/.{1,3}/g);
 
   useEffect(() => {
@@ -17,21 +18,24 @@ const BitcoinChart: React.FC = () => {
         channel: `live_trades_${currencyPair}`,
       },
     };
-    const ws = new WebSocket("wss://ws.bitstamp.net");
+
+    const ws = new WebSocket(
+      `wss://stream-cloud.binanceru.net/ws/${currencyPair}@miniTicker`
+    );
 
     ws.onopen = () => {
       console.log("OPEN");
-      ws.send(JSON.stringify(subscribe));
+      // ws.send(JSON.stringify(subscribe));
     };
 
     ws.onmessage = (event) => {
       const response = JSON.parse(event.data);
 
-      console.log("RECEIVE");
+      console.log(response.c);
 
       chart.current.data.datasets[0].data.push({
         x: Date.now(),
-        y: response.data.price,
+        y: response.c,
       });
 
       chart.current.update("quiet");
@@ -58,28 +62,37 @@ const BitcoinChart: React.FC = () => {
       data={{
         datasets: [
           {
-            label: "Bitcoin Price",
-            backgroundColor: "rgba(255, 99, 132, 0.5)",
-            borderColor: "rgb(255, 99, 132)",
-            borderDash: [8, 4],
+            label: "BTC Price (USD)",
+            backgroundColor: "rgba(204, 221, 255, 100)",
+            borderColor: "rgb(39, 110, 230)",
             cubicInterpolationMode: "monotone",
-            fill: false,
+            fill: true,
             data: [],
           },
         ],
       }}
       options={{
         animation: true,
-        tooltips: {
-          mode: "interpolate",
-          intersect: false,
+        elements: {
+          point: {
+            radius: 0,
+          },
         },
         scales: {
+          y: {
+            ticks: {
+              stepSize: "20",
+            },
+          },
           x: {
             type: "realtime",
+            // time: {
+            //   stepSize: "1",
+            // },
             realtime: {
-              duration: 10000,
-              delay: 3000,
+              duration: 60000,
+              delay: 2000,
+              ttl: 182000,
               frameRate: 30,
               refresh: 1000,
               onRefresh: (chart: any) => {
@@ -94,7 +107,36 @@ const BitcoinChart: React.FC = () => {
             },
           },
         },
+        interaction: {
+          intersect: false,
+        },
+        plugins: {
+          zoom: {
+            pan: {
+              enabled: true,
+              mode: "x",
+            },
+            zoom: {
+              pinch: {
+                enabled: true,
+              },
+              wheel: {
+                enabled: true,
+              },
+              mode: "x",
+            },
+            limits: {
+              x: {
+                minDelay: 2000,
+                maxDelay: 4000,
+                minDuration: 10000,
+                maxDuration: 180000,
+              },
+            },
+          },
+        },
       }}
+      className="-mr-1"
     />
   );
 };

@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowRightIcon } from "@heroicons/react/solid";
+import { ArrowRightIcon, ExternalLinkIcon } from "@heroicons/react/solid";
 import { TransactionResult } from "types/transaction";
 import useSWR from "swr";
 import fetch from "../../shared/helpers/fetch";
@@ -38,7 +38,7 @@ function TransactionTable({ walletId, page }: { walletId: string; page: any }) {
 
   return (
     <>
-      <table className="min-w-full divide-y divide-gray-200">
+      <table className="min-w-full divide-y divide-gray-200 table-fixed">
         <thead className="bg-gray-50">
           <tr>
             <th
@@ -72,11 +72,11 @@ function TransactionTable({ walletId, page }: { walletId: string; page: any }) {
               scope="col"
               className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase"
             >
-              Value (ETH)
+              Value
             </th>
-            <th scope="col" className="relative px-6 py-3">
+            {/* <th scope="col" className="relative px-6 py-3">
               <span className="sr-only">Details</span>
-            </th>
+            </th> */}
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
@@ -85,8 +85,14 @@ function TransactionTable({ walletId, page }: { walletId: string; page: any }) {
               <td className="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
                 {item.blockNumber}
               </td>
-              <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                {item.hash.slice(0, 20) + "..."}
+              <td className="flex items-center px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                {item.hash.slice(0, 20) + "..."}{" "}
+                <a
+                  href={`https://etherscan.io/tx/${item.hash}`}
+                  className="text-gray-600 hover:text-gray-900"
+                >
+                  <ExternalLinkIcon className="w-4 h-4 ml-2" />
+                </a>
               </td>
               <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
                 <a
@@ -108,15 +114,7 @@ function TransactionTable({ walletId, page }: { walletId: string; page: any }) {
                 </a>
               </td>
               <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                {parseFloat(item.value) / 10 ** 18}
-              </td>
-              <td className="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
-                <a
-                  href={`https://etherscan.io/tx/${item.hash}`}
-                  className="text-indigo-600 hover:text-indigo-900"
-                >
-                  Details
-                </a>
+                {(parseFloat(item.value) / 10 ** 18).toFixed(4)} ETH
               </td>
             </tr>
           ))}

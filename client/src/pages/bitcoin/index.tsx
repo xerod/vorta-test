@@ -4,7 +4,9 @@ import BitcoinChart from "components/modules/BitcoinChart";
 const Bitcoin: React.FC = () => {
   return (
     <>
-      <BitcoinChart />
+      <div className="py-4 pl-4 mt-6 bg-white border rounded-lg shadow">
+        <BitcoinChart />
+      </div>
     </>
   );
 };

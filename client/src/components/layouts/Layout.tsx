@@ -1,6 +1,11 @@
 import React, { Fragment, useEffect, useState } from "react";
 import { Dialog, Menu, Transition } from "@headlessui/react";
-import { HomeIcon, MenuIcon, UsersIcon, XIcon } from "@heroicons/react/outline";
+import {
+  MenuIcon,
+  XIcon,
+  TrendingUpIcon,
+  ReceiptTaxIcon,
+} from "@heroicons/react/outline";
 import { Link, useHistory, useLocation } from "react-router-dom";
 import { SelectorIcon } from "@heroicons/react/solid";
 import { authenticationService } from "../../shared/services/auth.service";
@@ -8,8 +13,18 @@ import { userResponse, userService } from "../../shared/services/user.service";
 import SkeletonText from "components/elements/SkeletonText";
 
 const navigation = [
-  { name: "Transaction", href: "/transaction", icon: HomeIcon, current: true },
-  { name: "Live Prices", href: "/bitcoin", icon: UsersIcon, current: false },
+  {
+    name: "Transaction",
+    href: "/transaction",
+    icon: ReceiptTaxIcon,
+    current: true,
+  },
+  {
+    name: "Live Prices",
+    href: "/bitcoin",
+    icon: TrendingUpIcon,
+    current: false,
+  },
 ];
 
 function classNames(...classes: any[]) {
@@ -21,7 +36,7 @@ const Layout: React.FC = ({ children }) => {
   let location = useLocation();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isSelectedPath, setSelectedPath] = useState("/");
+  const [selectedPath, setSelectedPath] = useState("/");
   const [user, setUser] = useState<userResponse>();
 
   useEffect(() => {
@@ -33,7 +48,7 @@ const Layout: React.FC = ({ children }) => {
   useEffect(() => {
     const current_path = location.pathname.split("/")[1];
     setSelectedPath(`/${current_path}`);
-  }, [isSelectedPath, location]);
+  }, [selectedPath, location]);
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-100">
@@ -99,7 +114,7 @@ const Layout: React.FC = ({ children }) => {
                       key={item.name}
                       to={item.href}
                       className={classNames(
-                        item.href.includes(isSelectedPath)
+                        item.href.includes(selectedPath)
                           ? "bg-gray-100 text-gray-900"
                           : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
                         "group flex items-center px-2 py-2 text-base font-medium rounded-md"
@@ -107,7 +122,7 @@ const Layout: React.FC = ({ children }) => {
                     >
                       <item.icon
                         className={classNames(
-                          item.href.includes(isSelectedPath)
+                          item.href.includes(selectedPath)
                             ? "text-gray-500"
                             : "text-gray-400 group-hover:text-gray-500",
                           "mr-4 flex-shrink-0 h-6 w-6"
@@ -131,7 +146,7 @@ const Layout: React.FC = ({ children }) => {
                     </div>
                     <div className="ml-3">
                       <p className="text-base font-medium text-gray-700 group-hover:text-gray-900">
-                        Tom Cook
+                        {user?.firstName} {user?.lastName}
                       </p>
                       <p className="text-sm font-medium text-red-500 group-hover:text-red-700">
                         Logout
@@ -156,7 +171,7 @@ const Layout: React.FC = ({ children }) => {
             <div className="flex flex-col flex-1 pt-5 pb-4 overflow-y-auto">
               <div className="flex items-center flex-shrink-0 px-4 space-x-3">
                 <p className="text-2xl font-extrabold text-purple-900">
-                  Logohere
+                  Logo<span className="font-normal">here</span>
                 </p>
               </div>
 
@@ -173,7 +188,7 @@ const Layout: React.FC = ({ children }) => {
                             <span className="flex items-center justify-between min-w-0 space-x-3">
                               <img
                                 className="flex-shrink-0 w-10 h-10 bg-gray-300 rounded-full"
-                                src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=3&w=256&h=256&q=80"
+                                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                                 alt=""
                               />
                               <span className="flex flex-col flex-1 min-w-32">
@@ -212,14 +227,14 @@ const Layout: React.FC = ({ children }) => {
                           className="absolute right-0 z-10 mx-1 mt-1 origin-top bg-white divide-y divide-gray-200 rounded-md shadow-lg left-10 ring-1 ring-black ring-opacity-10 focus:outline-none"
                         >
                           <div className="px-1 py-1">
-                            <Menu.Item>
+                            <Menu.Item disabled>
                               {({ active }) => (
                                 <a
                                   href="#"
                                   className={classNames(
                                     active
                                       ? "bg-gray-100 rounded-md text-gray-800"
-                                      : "text-gray-700",
+                                      : "text-gray-700 opacity-75 cursor-not-allowed",
                                     "block p-2 text-sm"
                                   )}
                                 >
@@ -259,7 +274,7 @@ const Layout: React.FC = ({ children }) => {
                     key={item.name}
                     to={item.href}
                     className={classNames(
-                      item.href.includes(isSelectedPath)
+                      item.href.includes(selectedPath)
                         ? "bg-gray-100 text-gray-900"
                         : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
                       "group flex items-center px-2 py-2 text-sm font-medium rounded-md"
@@ -267,7 +282,7 @@ const Layout: React.FC = ({ children }) => {
                   >
                     <item.icon
                       className={classNames(
-                        item.href.includes(isSelectedPath)
+                        item.href.includes(selectedPath)
                           ? "text-gray-500"
                           : "text-gray-400 group-hover:text-gray-500",
                         "mr-3 flex-shrink-0 h-6 w-6"
@@ -292,11 +307,11 @@ const Layout: React.FC = ({ children }) => {
             <MenuIcon className="w-6 h-6" aria-hidden="true" />
           </button>
         </div>
-        <main className="relative z-0 flex-1 overflow-y-auto focus:outline-none">
+        <main className="relative z-0 flex-1 overflow-auto focus:outline-none">
           <div className="py-6">
             <div className="px-4 mx-auto max-w-7xl sm:px-6 md:px-8">
-              <h1 className="text-2xl font-semibold text-gray-900">
-                Dashboard
+              <h1 className="text-2xl font-semibold text-gray-900 capitalize">
+                {selectedPath.split("/")[1]}
               </h1>
             </div>
             <div className="px-4 mx-auto max-w-7xl sm:px-6 md:px-8">
