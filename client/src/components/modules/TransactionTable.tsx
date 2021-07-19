@@ -1,125 +1,219 @@
-import React from "react";
-import { ArrowRightIcon, ExternalLinkIcon } from "@heroicons/react/solid";
-import { TransactionResult } from "types/transaction";
-import useSWR from "swr";
-import fetch from "../../shared/helpers/fetch";
-import Spinner from "components/elements/Spinner";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/solid";
+import React, { useEffect, useState } from "react";
 
-export { TransactionTable };
+import { useTable, usePagination, useFilters } from "react-table";
 
-function TransactionTable({ walletId, page }: { walletId: string; page: any }) {
-  const { data, error, isValidating } = useSWR<TransactionResult[]>(
-    `http://localhost:4000/transactions/${walletId}?page=${page}`,
-    fetch,
-    { shouldRetryOnError: false }
+interface TableProps {
+  columns: any;
+  data: any[];
+}
+
+const TransactionTable: React.FC<TableProps> = ({ columns, data }) => {
+  const [paginationItems, setPaginationItems] = useState<any[]>([]);
+
+  const tableInstance: any = useTable<any>(
+    {
+      columns,
+      data,
+    },
+    useFilters,
+    usePagination
   );
 
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center space-y-2 bg-gray-50 min-h-40">
-        <p className="text-4xl font-light text-gray-600">No data found :(</p>
-        <a
-          href="/transaction"
-          className="text-sm text-gray-500 hover:underline"
-        >
-          Click here to find another transaction
-        </a>
-      </div>
-    );
-  }
+  const {
+    getTableProps, // table props from react-table
+    getTableBodyProps, // table body props from react-table
+    headerGroups, // headerGroups, if your table has groupings
+    // rows, // rows for the table based on the data passed
+    prepareRow, // Prepare the row (this function needs to be called for each row before getting the row props)
+    pageOptions,
+    page,
+    pageCount,
+    state: { pageIndex, pageSize },
+    gotoPage,
+    previousPage,
+    nextPage,
+    setPageSize,
+    canPreviousPage,
+    canNextPage,
+  } = tableInstance;
 
-  if (!data) {
-    return (
-      <div className="flex flex-col items-center justify-center space-y-2 bg-gray-50 min-h-40">
-        <Spinner />
-      </div>
-    );
-  }
+  const pageSizeOptions = [10, 20, 50];
+
+  useEffect(() => {
+    if (pageCount <= 7) {
+      setPaginationItems(
+        Array.from({ length: pageCount }).map((_, i) => i + 1)
+      );
+    } else if (pageIndex < 5) {
+      // #1 active page < 5 -> show first 5
+      setPaginationItems([1, 2, 3, 4, 5, "...", pageCount]);
+    } else if (pageIndex >= 5 && pageIndex < pageCount - 3) {
+      // #2 active page >= 5 && < pageCount - 3
+      setPaginationItems([
+        1,
+        "...",
+        pageIndex - 1,
+        pageIndex,
+        pageIndex + 1,
+        "...",
+        pageCount,
+      ]);
+    } else {
+      // #3 active page >= pageCount - 3 -> show last
+      setPaginationItems([
+        1,
+        "...",
+        pageCount - 4,
+        pageCount - 3,
+        pageCount - 2,
+        pageCount - 1,
+        pageCount,
+      ]);
+    }
+  }, [pageIndex, pageSize, pageCount]);
 
   return (
     <>
-      <table className="min-w-full divide-y divide-gray-200 table-fixed">
+      {/* {headerGroups[0].headers[2].render("Filter")} */}
+      <table
+        {...getTableProps()}
+        className="table-fixed divide-y divide-gray-200 w-full"
+      >
         <thead className="bg-gray-50">
-          <tr>
-            <th
-              scope="col"
-              className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase"
-            >
-              Block
-            </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase"
-            >
-              Hash
-            </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase"
-            >
-              From
-            </th>
-            <th scope="col" className="relative py-3">
-              <span className="sr-only">Arrow right</span>
-            </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase"
-            >
-              To
-            </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase"
-            >
-              Value
-            </th>
-            {/* <th scope="col" className="relative px-6 py-3">
-              <span className="sr-only">Details</span>
-            </th> */}
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {data?.map((item: any) => (
-            <tr key={item.hash}>
-              <td className="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
-                {item.blockNumber}
-              </td>
-              <td className="flex items-center px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                {item.hash.slice(0, 20) + "..."}{" "}
-                <a
-                  href={`https://etherscan.io/tx/${item.hash}`}
-                  className="text-gray-600 hover:text-gray-900"
+          {headerGroups.map((headerGroup: any) => (
+            <tr {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map((column: any, index: any) => (
+                <th
+                  {...column.getHeaderProps()}
+                  className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase"
                 >
-                  <ExternalLinkIcon className="w-4 h-4 ml-2" />
-                </a>
-              </td>
-              <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                <a
-                  href={`/transaction/${item.from}`}
-                  className="text-blue-500 hover:underline"
-                >
-                  {item.from.slice(0, 20) + "..."}
-                </a>
-              </td>
-              <td className="text-sm text-gray-500 whitespace-nowrap">
-                <ArrowRightIcon className="w-4 h-4" />
-              </td>
-              <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                <a
-                  href={`/transaction/${item.to}`}
-                  className="text-blue-500 hover:underline"
-                >
-                  {item.to.slice(0, 20) + "..."}
-                </a>
-              </td>
-              <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                {(parseFloat(item.value) / 10 ** 18).toFixed(4)} ETH
-              </td>
+                  <div className="flex items-center">
+                    {column.render("Header")}
+                    {column.Header === "From" ? column.render("Filter") : null}
+                  </div>
+                </th>
+              ))}
             </tr>
           ))}
+        </thead>
+        <tbody
+          {...getTableBodyProps()}
+          className="bg-white divide-y divide-gray-100"
+        >
+          {page.map((row: any, i: any) => {
+            prepareRow(row);
+
+            return (
+              <tr {...row.getRowProps()}>
+                {row.cells.map((cell: any) => {
+                  return (
+                    <td
+                      {...cell.getCellProps()}
+                      className="px-6 py-4 text-sm text-gray-500 truncate"
+                    >
+                      {cell.render("Cell")}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
+      <div className="flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200 sm:px-6">
+        <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+          <div>
+            <span>
+              Page{" "}
+              <strong>
+                {pageIndex + 1} of {pageOptions.length}
+              </strong>{" "}
+            </span>
+            <select
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+              }}
+              className="border py-2 px-4"
+            >
+              {[10, 25, 50].map((pageSize) => (
+                <option key={pageSize} value={pageSize}>
+                  Show {pageSize}
+                </option>
+              ))}
+            </select>
+          </div>
+          <nav
+            className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm"
+            aria-label="Pagination"
+          >
+            <button
+              onClick={() => previousPage()}
+              disabled={!canPreviousPage}
+              className="relative inline-flex items-center px-2 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 disabled:text-gray-300 rounded-l-md not-disabled:hover:bg-gray-50 focus:outline-none disabled:cursor-not-allowed"
+            >
+              <span className="sr-only">Previous</span>
+              <ChevronLeftIcon className="w-5 h-5" aria-hidden="true" />
+            </button>
+            {paginationItems.map((p, i) => (
+              <div key={p.toString() + i}>
+                {p === "..." ? (
+                  <EmptyPageButton />
+                ) : (
+                  <PageButton
+                    page={p}
+                    isActive={p - 1 === pageIndex}
+                    onClick={() => gotoPage(p - 1)}
+                  />
+                )}
+              </div>
+            ))}
+            <button
+              onClick={() => nextPage()}
+              disabled={!canNextPage}
+              className="relative inline-flex items-center px-2 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 disabled:text-gray-300 rounded-r-md not-disabled:hover:bg-gray-50 disabled:cursor-not-allowed focus:outline-none"
+            >
+              <span className="sr-only">Next</span>
+              <ChevronRightIcon className="w-5 h-5" aria-hidden="true" />
+            </button>
+          </nav>
+        </div>
+      </div>
     </>
   );
-}
+};
+
+export const PageButton: React.FC<any> = function PageButton({
+  page,
+  isActive,
+  onClick,
+}) {
+  if (isActive) {
+    return (
+      <button
+        aria-current="page"
+        className="relative z-10 inline-flex items-center px-4 py-2 text-sm font-medium text-indigo-600 border border-indigo-500 bg-indigo-50 focus:outline-none"
+        onClick={onClick}
+      >
+        {page}
+      </button>
+    );
+  }
+  return (
+    <button
+      className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 hover:bg-gray-50 focus:outline-none"
+      onClick={onClick}
+    >
+      {page}
+    </button>
+  );
+};
+
+export const EmptyPageButton = () => (
+  <span className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300">
+    ...
+  </span>
+);
+
+export default TransactionTable;
