@@ -75,7 +75,7 @@ const TransactionTable: React.FC<TableProps> = ({ columns, data }) => {
 
   return (
     <>
-      {/* {headerGroups[0].headers[2].render("Filter")} */}
+      {headerGroups[0].headers[1].render("Filter")}
       <table
         {...getTableProps()}
         className="table-fixed divide-y divide-gray-200 w-full"
@@ -123,26 +123,26 @@ const TransactionTable: React.FC<TableProps> = ({ columns, data }) => {
       </table>
       <div className="flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200 sm:px-6">
         <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-          <div>
+          <div className="flex items-center text-sm group">
+            <div className="border rounded-md py-2 px-3 mr-4">
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                }}
+                className="group-focus:ring-2 focus:outline-none"
+              >
+                {[10, 25, 50].map((pageSize) => (
+                  <option key={pageSize} value={pageSize}>
+                    Show {pageSize}
+                  </option>
+                ))}
+              </select>
+            </div>
             <span>
-              Page{" "}
-              <strong>
-                {pageIndex + 1} of {pageOptions.length}
-              </strong>{" "}
+              Page <span className="font-medium">{pageIndex + 1}</span> of{" "}
+              <span className="font-medium">{pageOptions.length}</span>
             </span>
-            <select
-              value={pageSize}
-              onChange={(e) => {
-                setPageSize(Number(e.target.value));
-              }}
-              className="border py-2 px-4"
-            >
-              {[10, 25, 50].map((pageSize) => (
-                <option key={pageSize} value={pageSize}>
-                  Show {pageSize}
-                </option>
-              ))}
-            </select>
           </div>
           <nav
             className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm"

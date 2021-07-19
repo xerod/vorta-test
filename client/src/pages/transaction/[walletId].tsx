@@ -5,6 +5,7 @@ import TransactionTable from "components/modules/TransactionTable";
 import { fromFetch } from "rxjs/fetch";
 import { defer, from, mergeMap } from "rxjs";
 import { matchSorter } from "match-sorter";
+import { SearchIcon } from "@heroicons/react/solid";
 
 export default function Page() {
   const walletId = location.pathname.split("/")[2];
@@ -46,7 +47,7 @@ export default function Page() {
       {
         Header: "Hash",
         accessor: "hash",
-        disableFilters: true,
+        Filter: SearchColumnFilter,
       },
       {
         Header: "From",
@@ -118,5 +119,31 @@ function SelectColumnFilter({
         </option>
       ))}
     </select>
+  );
+}
+
+function SearchColumnFilter({
+  column: { filterValue, preFilteredRows, setFilter },
+}: any) {
+  const count = preFilteredRows.length;
+
+  return (
+    <div className="min-w-full border-b bg-white relative text-gray-400 focus-within:text-gray-500">
+      <label htmlFor="search" className="sr-only">
+        Search
+      </label>
+      <input
+        value={filterValue || ""}
+        onChange={(e) => {
+          setFilter(e.target.value || undefined); // Set undefined to remove the filter entirely
+        }}
+        type="search"
+        placeholder={`Search ${count} transaction hash...`}
+        className="block w-full border-transparent pl-12 placeholder-gray-300 py-4 focus:outline-none focus:ring focus:ring-indigo-500 focus:placeholder-gray-500"
+      />
+      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center pl-4">
+        <SearchIcon className="h-5 w-5" aria-hidden="true" />
+      </div>
+    </div>
   );
 }
